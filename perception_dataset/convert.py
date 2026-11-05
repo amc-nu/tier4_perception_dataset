@@ -106,6 +106,11 @@ def main():
                 frame_match_tolerance_ms=config_dict["conversion"].get(
                     "frame_match_tolerance_ms", 50.0
                 ),
+                attribute_value_priority=config_dict["conversion"].get("attribute_value_priority"),
+                static_attributes=config_dict["conversion"].get("static_attributes"),
+                category_attributes=config_dict["conversion"].get("category_attributes"),
+                task_definition_classes=config_dict["conversion"].get("task_definition_classes"),
+                attribute_map=config_dict["conversion"].get("attribute_map"),
             )
 
             logger.info(
@@ -141,6 +146,8 @@ def main():
             overwrite_mode=args.overwrite,
             category_map=config_dict["conversion"].get("category_map"),
             include_attributes=config_dict["conversion"].get("include_attributes", True),
+            attribute_map=config_dict["conversion"].get("attribute_map"),
+            occlusion_to_visibility=config_dict["conversion"].get("occlusion_to_visibility"),
         )
 
         logger.info(
@@ -416,6 +423,35 @@ def main():
         logger.info(f"[BEGIN] Merging T4 dataset ({input_base}) into T4 dataset ({output_base})")
         converter.convert()
         logger.info(f"[Done] Merging T4 dataset ({input_base}) into T4 dataset ({output_base})")
+
+    elif task == "align_non_annotated_t4_to_reference":
+        from perception_dataset.t4_dataset.align_non_annotated_t4_to_reference import (
+            AlignNonAnnotatedT4ToReferenceConverter,
+        )
+
+        input_base = config_dict["conversion"]["input_base"]
+        reference_base = config_dict["conversion"]["reference_base"]
+        output_base = config_dict["conversion"]["output_base"]
+
+        converter = AlignNonAnnotatedT4ToReferenceConverter(
+            input_base=input_base,
+            reference_base=reference_base,
+            output_base=output_base,
+            max_abs_diff_ms=config_dict["conversion"].get("max_abs_diff_ms", 0.1),
+            max_frame_drop_ratio=config_dict["conversion"].get("max_frame_drop_ratio", 0.1),
+            write_alignment_report=config_dict["conversion"].get("write_alignment_report", True),
+            logger=logger,
+        )
+
+        logger.info(
+            "[BEGIN] Aligning non-annotated T4 dataset "
+            f"({input_base}) to reference ({reference_base})"
+        )
+        converter.convert()
+        logger.info(
+            "[DONE] Aligning non-annotated T4 dataset "
+            f"({input_base}) to reference ({reference_base})"
+        )
 
     elif task == "interpolate":
         from perception_dataset.t4_dataset.data_interpolator import DataInterpolator
