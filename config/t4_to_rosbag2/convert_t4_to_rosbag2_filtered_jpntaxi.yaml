@@ -1,0 +1,53 @@
+task: convert_t4_to_rosbag2
+description:
+  scene: t4_to_rosbag2_filtered
+conversion:
+  input_base: /media/abrahamcano/soslab/t4_datasets/t4_dataset/db_jpntaxigen2_v1_10hz
+  output_base: /media/abrahamcano/soslab/t4_datasets/t4_dataset_gt_rosbags_filtered/db_jpntaxigen2_v1_10hz
+  storage_id: mcap
+  object_topic_name: /ground_truth/objects
+  tracked_object_topic_name: /ground_truth/tracked_objects
+  pointcloud_format: default
+  world_frame_id: map
+  base_frame_id: base_link
+  # Opt-in. Applied per frame on the original T4 categories, before class_mapping.
+  # A trailer is folded into the nearest parent whose BEV edge-to-edge gap is <= distance (or overlaps).
+  merge_trailers:
+    distance: 1.0
+    trailer_categories: [truck.trailer, semi_trailer]
+    parent_categories: [truck, truck.common, truck.construction, construction_vehicle, tractor_unit]
+  # Opt-in. T4 category -> internal class (null / missing = dropped), then internal class -> Autoware label
+  # (car/truck/bus/trailer/motorcycle/bicycle/pedestrian/animal -> same label; traffic_cone/barrier/debris -> HAZARD).
+  class_mapping:
+    car: car
+    car.common: car
+    car.special: car
+    car.emergency: car
+    police_car: car
+    ambulance: car
+    truck: truck
+    truck.common: truck
+    truck.emergency: truck
+    truck.construction: truck
+    construction_vehicle: truck
+    tractor_unit: truck
+    truck.trailer: truck
+    semi_trailer: truck
+    bus: bus
+    motorcycle: motorcycle
+    bicycle: bicycle
+    pedestrian: pedestrian
+    pedestrian.common: pedestrian
+    pedestrian.stroller: pedestrian
+    pedestrian.personal_mobility: pedestrian
+    personal_mobility: pedestrian
+    construction_worker: pedestrian
+    police_officer: pedestrian
+    wheelchair: pedestrian
+    animal: animal
+    barrier.movable: barrier
+    barrier.construction_sign: barrier
+    traffic_cone: traffic_cone
+    debris.unclassified: debris
+    debris.pushable_pullable: debris
+    train: null
